@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>dropdropdrop</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+    }
+
+    .warpper {
+      width: 100%;
+      height: 50vh;
+      background-color: aquamarine;
+      color: brown;
+    }
+
+    .idd {
+      width: 100%;
+      height: 50px;
+      background-color: antiquewhite;
+      border: 1px solid brown;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="warpper">
+    <div draggable="true" class="idd" data-index='1'>1</div>
+    <div draggable="true" class="idd" data-index='2'>2</div>
+    <div draggable="true" class="idd" data-index='3'>3</div>
+    <div draggable="true" class="idd" data-index='4'>4</div>
+    <div draggable="true" class="idd" data-index='5'>5</div>
+  </div>
+  <script>
+    let draggable = document.querySelectorAll('.idd')
+    let target = null;
+    let cloneNode = null;
+    let curruntNode = null;
+    let shouldDrop = false
+    document.addEventListener('dragstart', function (e) {
+      target = e.target
+      cloneNode = target.cloneNode(true)
+    })
+    document.addEventListener('dragend', function (e) {
+        if(shouldDrop){
+          shouldDrop = false
+          e.target.remove()
+        }
+    })
+    document.addEventListener('dragover', function (e) {
+      e.preventDefault()
+      if (e.target.className === 'warpper') {
+        return
+      }
+      if (e.target.dataset.index === cloneNode.dataset.index) {
+        return
+      }
+      if (curruntNode != e) {
+        curruntNode = e
+      }
+      let prevNode = curruntNode.target.previousElementSibling ? curruntNode.target.previousElementSibling : curruntNode.target
+      let nextNode = curruntNode.target.nextElementSibling ? curruntNode.target.nextElementSibling : curruntNode.target
+    
+      let nextAttr = curruntNode.target == nextNode ? nextNode.offsetHeight + nextNode.offsetTop : nextNode.offsetTop
+      if (curruntNode.y < curruntNode.target.offsetTop + (curruntNode.target.offsetHeight / 2) + 5) {
+        if ( target.offsetTop <= curruntNode.y && curruntNode.y <= nextAttr) {
+          return;
+        }
+        // console.log('target.offsetTop:', target.offsetTop, 'y:',curruntNode.y , 'nextNode:', nextAttr);
+        curruntNode.target.insertAdjacentElement('beforebegin', cloneNode)
+      } else {
+        if(curruntNode.y <= target.offsetTop && curruntNode.y >= curruntNode.target.offsetTop && curruntNode.y >= prevNode.offsetTop){
+          return;
+        }
+        // console.log(curruntNode.y, 'y' ,  'dragoffsetTop', curruntNode.target.offsetTop + (curruntNode.target.offsetHeight / 2) + 10 ,'targetNode.offsetTop',target.offsetTop);
+        curruntNode.target.insertAdjacentElement('afterend', cloneNode)
+      }
+      shouldDrop = true
+    })
+  </script>
+</body>
+
+</html>
